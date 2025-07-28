@@ -682,7 +682,7 @@ export default function Portfolio() {
               <div className="text-4xl md:text-6xl mt-2 text-gray-300 font-light tracking-widest">
                 <GlitchTypewriter
                   texts={["CYBERSECURITY SPECIALIST", "SYSTEM ADMINISTRATOR", "SECURITY RESEARCHER", "IT PROFESSIONAL"]}
-                  delay={1000}
+                  delay={500}
                 />
               </div>
             </div>
