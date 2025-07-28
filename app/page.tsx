@@ -1362,7 +1362,6 @@ export default function Portfolio() {
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Built with Next.js, Three.js, and a passion for cybersecurity.
           </motion.div>
         </div>
       </footer>
