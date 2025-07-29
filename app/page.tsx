@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { FloatingThemeToggle } from "@/components/theme-toggle"
 
 // Smooth and Professional Typewriter Component
 function GlitchTypewriter({ texts, delay = 0 }: { texts: string[]; delay?: number }) {
@@ -353,6 +354,33 @@ export default function Portfolio() {
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
   const [showResumeModal, setShowResumeModal] = useState(false)
 
+  // Simple scroll lock and escape key handling
+  useEffect(() => {
+    if (showResumeModal) {
+      // Lock scroll when modal is open
+      document.body.style.overflow = 'hidden';
+      
+      // Handle escape key to close modal
+      const handleEscape = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setShowResumeModal(false);
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      
+      // Cleanup
+      return () => {
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [showResumeModal])
+  
+  // No longer need PDF loading handlers as we're using direct download links
+
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2000)
     return () => clearTimeout(timer)
@@ -445,32 +473,24 @@ export default function Portfolio() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
-      <MinimalTechBackground />
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white overflow-x-hidden relative transition-all duration-700 ease-in-out">
+      {/* Floating Theme Toggle */}
+      <FloatingThemeToggle />
 
       {/* Navigation */}
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-40 bg-black/60 backdrop-blur-xl border-b border-cyan-500/30"
+        className="fixed top-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, type: "spring" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-between items-center py-4">
             <motion.div
-              className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+              className="text-xl font-bold text-gray-900 dark:text-white"
               whileHover={{ y: -2 }}
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-              style={{ backgroundSize: "200% 200%" }}
             >
-              {"<ANKIT.SEC />"}
+              Ankit Kumar
             </motion.div>
 
             {/* Desktop Navigation */}
@@ -479,16 +499,18 @@ export default function Portfolio() {
                 <motion.button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className={`capitalize relative px-4 py-2 transition-all duration-300 ${
-                    activeSection === item ? "text-cyan-400" : "text-gray-300 hover:text-cyan-400"
+                  className={`capitalize relative px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                    activeSection === item 
+                      ? "text-blue-600 dark:text-blue-400" 
+                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                   }`}
-                  whileHover={{ y: -2 }}
+                  whileHover={{ y: -1 }}
                   whileTap={{ y: 0 }}
                 >
                   {item}
                   {activeSection === item && (
                     <motion.div
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-500"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400"
                       layoutId="activeTab"
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />
@@ -496,6 +518,21 @@ export default function Portfolio() {
                 </motion.button>
               ))}
             </div>
+
+            {/* Resume Button */}
+            <motion.div
+              className="hidden md:block"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <a 
+                href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download CV</span>
+              </a>
+            </motion.div>
 
             {/* Mobile Menu Button */}
             <motion.button
@@ -505,31 +542,21 @@ export default function Portfolio() {
             >
               <div className="w-6 h-6 relative">
                 <motion.span
-                  className="absolute top-0 left-0 w-full h-0.5 bg-cyan-400 transform origin-center"
+                  className="absolute top-0 left-0 w-full h-0.5 bg-gray-900 dark:bg-white transform origin-center"
                   animate={isMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
                   transition={{ duration: 0.3 }}
                 />
                 <motion.span
-                  className="absolute top-2 left-0 w-full h-0.5 bg-cyan-400"
+                  className="absolute top-2 left-0 w-full h-0.5 bg-gray-900 dark:bg-white"
                   animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 />
                 <motion.span
-                  className="absolute top-4 left-0 w-full h-0.5 bg-cyan-400 transform origin-center"
+                  className="absolute top-4 left-0 w-full h-0.5 bg-gray-900 dark:bg-white transform origin-center"
                   animate={isMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
                   transition={{ duration: 0.3 }}
                 />
               </div>
-            </motion.button>
-            {/* Resume Download Button */}
-            <motion.button
-              onClick={() => setShowResumeModal(true)}
-              className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Eye className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" />
-              <span>Resume</span>
             </motion.button>
           </div>
         </div>
@@ -538,26 +565,35 @@ export default function Portfolio() {
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
-              className="md:hidden bg-black/95 backdrop-blur-xl border-t border-cyan-500/30"
+              className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="px-4 py-6 space-y-4">
+              <div className="px-6 py-4 space-y-2">
                 {["home", "about", "projects", "skills", "contact"].map((item, index) => (
                   <motion.button
                     key={item}
                     onClick={() => scrollToSection(item)}
-                    className="block w-full text-left capitalize text-gray-300 hover:text-cyan-400 transition-colors py-2"
+                    className="block w-full text-left capitalize text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-3 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    whileHover={{ x: 10 }}
+                    whileHover={{ x: 4 }}
                   >
                     {item}
                   </motion.button>
                 ))}
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <a
+                    href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                    className="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 text-center"
+                  >
+                    <Download className="w-4 h-4 mr-2 inline" />
+                    Download Resume
+                  </a>
+                </div>
               </div>
             </motion.div>
           )}
@@ -565,21 +601,23 @@ export default function Portfolio() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <motion.div className="text-center z-10 px-4 relative" style={{ y: backgroundY }}>
+      <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <motion.div className="text-center z-10 px-6 max-w-6xl mx-auto relative" style={{ y: backgroundY }}>
           <motion.div
-            className="mb-8"
-            initial={{ opacity: 0, scale: 0.5 }}
+            className="mb-12"
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <div className="text-6xl md:text-8xl font-black mb-4 relative">
-              <span className="bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
-                ANKIT
-              </span>
-              <div className="text-4xl md:text-6xl mt-2 text-gray-300 font-light tracking-widest">
+            <div className="mb-8">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">
+                <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                  Ankit Kumar
+                </span>
+              </h1>
+              <div className="text-xl md:text-2xl lg:text-3xl text-gray-300 font-medium tracking-wide">
                 <GlitchTypewriter
-                  texts={["CYBERSECURITY SPECIALIST", "SYSTEM ADMINISTRATOR", "SECURITY RESEARCHER", "IT PROFESSIONAL"]}
+                  texts={["Cybersecurity Specialist", "System Administrator", "Security Researcher", "IT Professional"]}
                   delay={500}
                 />
               </div>
@@ -587,33 +625,32 @@ export default function Portfolio() {
           </motion.div>
 
           <motion.p
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-lg md:text-xl text-gray-400 mb-12 max-w-4xl mx-auto leading-relaxed font-light"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.5 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
           >
-            Securing digital environments through{" "}
-            <span className="text-cyan-400 font-semibold">advanced cybersecurity</span>,{" "}
-            <span className="text-purple-400 font-semibold">system administration</span>, and{" "}
-            <span className="text-pink-400 font-semibold">vulnerability assessment</span>
+            Dedicated to securing digital environments through{" "}
+            <span className="text-blue-400 font-medium">advanced cybersecurity practices</span>,{" "}
+            <span className="text-cyan-400 font-medium">comprehensive system administration</span>, and{" "}
+            <span className="text-teal-400 font-medium">proactive vulnerability assessment</span>
           </motion.p>
 
           <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-            initial={{ opacity: 0, y: 30 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 2 }}
+            transition={{ duration: 0.8, delay: 1.6 }}
           >
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Button
                 onClick={() => scrollToSection("projects")}
-                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-2xl relative overflow-hidden group"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base font-medium shadow-lg shadow-blue-600/25 transition-all duration-300"
               >
-                <span className="relative z-10 flex items-center">
+                <span className="flex items-center">
                   <Rocket className="w-5 h-5 mr-2" />
-                  Explore My Universe
+                  View My Work
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
             </motion.div>
 
@@ -621,154 +658,166 @@ export default function Portfolio() {
               <Button
                 onClick={() => scrollToSection("contact")}
                 variant="outline"
-                className="border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black px-8 py-4 rounded-full text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
+                className="border-2 border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-gray-500 px-8 py-3 rounded-lg text-base font-medium transition-all duration-300"
               >
-                <span className="relative z-10 flex items-center">
-                  <Zap className="w-5 h-5 mr-2" />
-                  Connect & Collaborate
+                <span className="flex items-center">
+                  <Mail className="w-5 h-5 mr-2" />
+                  Get In Touch
                 </span>
               </Button>
             </motion.div>
+            
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <Button
-                onClick={() => setShowResumeModal(true)}
-                variant="outline"
-                className="border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black px-8 py-4 rounded-full text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
+              <a
+                href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                className="border-2 border-cyan-600 text-cyan-400 hover:bg-cyan-600 hover:text-white px-8 py-3 rounded-lg text-base font-medium transition-all duration-300 inline-flex items-center"
               >
-                <span className="relative z-10 flex items-center">
-                  <Eye className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"></Eye>
-                  Preview Resume
-                </span>
-              </Button>
+                <Download className="w-5 h-5 mr-2" />
+                Download Resume
+              </a>
             </motion.div>
           </motion.div>
 
-          {/* Floating stats */}
+          {/* Professional stats */}
           <motion.div
-            className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 50 }}
+            className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 2.5 }}
+            transition={{ duration: 0.8, delay: 2 }}
           >
             {[
               { number: "10+", label: "Security Projects" },
-              { number: "3+", label: "Years Learning" },
-              { number: "25+", label: "Tools Mastered" },
+              { number: "3+", label: "Years Experience" },
+              { number: "25+", label: "Technologies" },
             ].map((stat, index) => (
               <motion.div key={index} className="text-center" whileHover={{ y: -2 }}>
-                <div className="text-3xl md:text-4xl font-bold text-cyan-400 mb-2">{stat.number}</div>
-                <div className="text-gray-400 text-sm uppercase tracking-wider">{stat.label}</div>
+                <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-1">{stat.number}</div>
+                <div className="text-gray-500 text-sm font-medium uppercase tracking-wide">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
         </motion.div>
-
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 15, 0] }}
-          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-        >
-          <ChevronDown className="w-8 h-8 text-cyan-400" />
-        </motion.div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-32 px-4 relative">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2
-            className="text-5xl md:text-7xl font-black text-center mb-20 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 50 }}
+      <section id="about" className="py-24 px-6 bg-gray-50 dark:bg-gray-900/50">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            ABOUT THE ARCHITECT
-          </motion.h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              About Me
+            </h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto"></div>
+          </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <div className="space-y-6 text-lg text-gray-300 leading-relaxed">
+              <div className="space-y-6 text-base text-gray-600 dark:text-gray-300 leading-relaxed">
                 <p>
-                  I'm a <span className="text-cyan-400 font-semibold">cybersecurity specialist</span> and system
-                  administrator passionate about securing digital environments and protecting against emerging threats.
-                  Currently pursuing my B.Tech in Computer Science & Engineering, I combine academic knowledge with
-                  hands-on experience in vulnerability assessment and incident response.
+                  I'm a dedicated <span className="text-blue-600 dark:text-blue-400 font-medium">cybersecurity specialist</span> and system
+                  administrator with a passion for protecting digital environments and mitigating emerging threats.
+                  Currently pursuing my B.Tech in Computer Science & Engineering, I bring together academic knowledge with
+                  practical experience in vulnerability assessment and incident response.
                 </p>
                 <p>
-                  My expertise spans across <span className="text-purple-400 font-semibold">penetration testing</span>,
-                  <span className="text-pink-400 font-semibold"> malware analysis</span>, and
-                  <span className="text-cyan-400 font-semibold"> system optimization</span>. I've developed
-                  comprehensive security tools and led teams in competitive hackathons, earning recognition for
-                  innovative solutions.
+                  My expertise encompasses <span className="text-cyan-600 dark:text-cyan-400 font-medium">penetration testing</span>,
+                  <span className="text-teal-600 dark:text-teal-400 font-medium"> malware analysis</span>, and
+                  <span className="text-blue-600 dark:text-blue-400 font-medium"> system optimization</span>. I've successfully developed
+                  comprehensive security tools and led teams in competitive environments, earning recognition for
+                  innovative and effective solutions.
                 </p>
                 <p>
-                  Every security challenge is an opportunity to strengthen defenses, every vulnerability assessment a
-                  step toward a more secure digital landscape, and every incident response a chance to learn and
-                  improve.
+                  I believe that every security challenge presents an opportunity to strengthen defenses, every vulnerability
+                  assessment is a step toward a more secure digital landscape, and every incident response is a valuable
+                  learning experience that drives continuous improvement.
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-8 mt-12">
                 {[
-                  { icon: Brain, number: "5+", label: "Security Tools Built" },
+                  { icon: Brain, number: "15+", label: "Security Tools Built" },
                   { icon: Cpu, number: "50K+", label: "Lines of Code" },
                 ].map((stat, index) => (
                   <motion.div
                     key={index}
-                    className="text-center group"
-                    whileHover={{ y: -2 }}
+                    className="text-center p-6 bg-white dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50"
+                    whileHover={{ y: -4 }}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.2 }}
                     viewport={{ once: true }}
                   >
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full mb-4 group-hover:shadow-2xl group-hover:shadow-cyan-500/50 transition-all duration-300">
-                      <stat.icon className="w-8 h-8 text-white" />
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg mb-4">
+                      <stat.icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="text-3xl font-bold text-cyan-400 mb-2">{stat.number}</div>
-                    <div className="text-gray-400 text-sm uppercase tracking-wider">{stat.label}</div>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stat.number}</div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm font-medium">{stat.label}</div>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Resume Download Section */}
+              {/* Resume Section */}
               <motion.div
                 className="mt-12 text-center"
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
                 viewport={{ once: true }}
               >
                 <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-                  <Button
-                    onClick={() => setShowResumeModal(true)}
-                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-2xl shadow-purple-500/30 relative overflow-hidden group"
+                  <a
+                    href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg shadow-blue-600/25 transition-all duration-300 inline-flex items-center"
                   >
-                    <span className="relative z-10 flex items-center">
-                      <Eye className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"></Eye>
-                      Preview Resume
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </Button>
+                    <Download className="w-5 h-5 mr-2" />
+                    Download Resume
+                  </a>
                 </motion.div>
-                <p className="text-gray-400 text-sm mt-3">Complete professional background & achievements</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-3">Complete professional background & achievements</p>
               </motion.div>
             </motion.div>
 
             <motion.div
               className="grid grid-cols-2 gap-6"
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
               {skills.map((skill, index) => (
-                <SkillOrb key={skill.name} skill={skill.name} percentage={skill.percentage} delay={index * 0.1} />
+                <motion.div
+                  key={skill.name}
+                  className="bg-white dark:bg-gray-800/50 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium text-gray-900 dark:text-white">{skill.name}</h3>
+                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">{skill.percentage}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <motion.div
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.percentage}%` }}
+                      transition={{ duration: 1.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    />
+                  </div>
+                </motion.div>
               ))}
             </motion.div>
           </div>
@@ -776,132 +825,90 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Section */}
-
-      <section id="projects" className="py-32 px-4 bg-gradient-to-b from-gray-900/20 to-black relative overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-purple-500/5 to-pink-500/5" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-
-        <div className="max-w-7xl mx-auto relative">
-          <motion.h2
-            className="text-5xl md:text-7xl font-black text-center mb-8 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 50 }}
+      <section id="projects" className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            DIGITAL MASTERPIECES
-          </motion.h2>
-
-          <motion.p
-            className="text-xl text-gray-400 text-center mb-20 max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Explore my portfolio of cutting-edge projects that push the boundaries of technology and innovation
-          </motion.p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Featured Projects
+            </h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Explore my portfolio of cybersecurity and system administration projects
+            </p>
+          </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 className="group"
               >
-                <div className="relative h-full">
-                  {/* Enhanced glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-110" />
-
-                  {/* Main card */}
-                  <div className="relative bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl overflow-hidden h-full transition-all duration-500 group-hover:border-cyan-500/50 group-hover:shadow-2xl group-hover:shadow-cyan-500/20">
-                    {/* Image container with enhanced effects */}
-                    <div className="relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
-                      <img
-                        src={project.image || "/placeholder.svg"}
-                        alt={project.title}
-                        className="w-full h-56 object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                      />
-
-                      {/* Overlay with enhanced animations */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 z-20" />
-
-                      {/* Action buttons with better positioning */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-30">
-                        <div className="flex space-x-4">
-                          <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-                            <Button
-                              size="sm"
-                              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/30"
-                            >
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              Demo
-                            </Button>
-                          </motion.div>
-                          <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-2 border-white/80 text-white hover:bg-white hover:text-black bg-black/20 backdrop-blur-sm"
-                            >
-                              <Github className="w-4 h-4 mr-2" />
-                              Code
-                            </Button>
-                          </motion.div>
-                        </div>
-                      </div>
-
-                      {/* Project number indicator */}
-                      <div className="absolute top-4 right-4 w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm z-20">
-                        {String(index + 1).padStart(2, "0")}
+                <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-2">
+                  {/* Image container */}
+                  <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-700/30 h-48">
+                    <img
+                      src={project.image || "/placeholder.svg"}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    {/* Action buttons */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="flex space-x-3">
+                        <Button
+                          size="sm"
+                          className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Demo
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="bg-white/90 hover:bg-white text-gray-900 border-white/90"
+                        >
+                          <Github className="w-4 h-4 mr-1" />
+                          Code
+                        </Button>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Content with enhanced styling */}
-                    <div className="p-6 relative">
-                      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1">
+                      {project.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
+                      {project.description}
+                    </p>
 
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors duration-300">
-                        {project.title}
-                      </h3>
-                      <p className="text-gray-400 mb-6 leading-relaxed text-sm">{project.description}</p>
-
-                      {/* Enhanced tech stack */}
-                      <div className="flex flex-wrap gap-2">
-                        {project.tech.map((tech, techIndex) => (
-                          <motion.span
-                            key={techIndex}
-                            className="px-3 py-1 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 text-cyan-300 rounded-full text-xs border border-cyan-500/20 hover:border-cyan-500/50 transition-all duration-300 cursor-default"
-                            whileHover={{ y: -2, backgroundColor: "rgba(6, 182, 212, 0.2)" }}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3, delay: techIndex * 0.05 }}
-                            viewport={{ once: true }}
-                          >
-                            {tech}
-                          </motion.span>
-                        ))}
-                      </div>
-
-                      {/* Progress indicator */}
-                      <div className="mt-4 flex items-center space-x-2">
-                        <div className="flex-1 h-1 bg-gray-700 rounded-full overflow-hidden">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"
-                            initial={{ width: 0 }}
-                            whileInView={{ width: "100%" }}
-                            transition={{ duration: 1.5, delay: index * 0.2 }}
-                            viewport={{ once: true }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-500">Complete</span>
-                      </div>
+                    {/* Tech stack */}
+                    <div className="flex flex-wrap gap-2">
+                      {project.tech.slice(0, 3).map((tech, techIndex) => (
+                        <span
+                          key={techIndex}
+                          className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded text-xs font-medium"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                      {project.tech.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-xs font-medium">
+                          +{project.tech.length - 3}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -911,37 +918,41 @@ export default function Portfolio() {
 
           {/* Call to action */}
           <motion.div
-            className="text-center mt-16"
-            initial={{ opacity: 0, y: 30 }}
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             viewport={{ once: true }}
           >
-            <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <Button
-                onClick={() => scrollToSection("contact")}
-                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-2xl shadow-cyan-500/30"
-              >
-                <Rocket className="w-5 h-5 mr-2" />
-                Start Your Project
-              </Button>
-            </motion.div>
+            <Button
+              onClick={() => scrollToSection("contact")}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg shadow-blue-600/25"
+            >
+              <Rocket className="w-5 h-5 mr-2" />
+              Start a Project
+            </Button>
           </motion.div>
         </div>
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-32 px-4 relative">
-        <div className="max-w-7xl mx-auto">
-          <motion.h2
-            className="text-5xl md:text-7xl font-black text-center mb-20 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 50 }}
+      <section id="skills" className="py-24 px-6 bg-gray-50 dark:bg-gray-900/50">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            TECH ARSENAL
-          </motion.h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Technical Expertise
+            </h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Comprehensive skills across cybersecurity, system administration, and development
+            </p>
+          </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -1113,17 +1124,23 @@ export default function Portfolio() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-32 px-4 bg-gradient-to-b from-gray-900/20 to-black relative">
-        <div className="max-w-6xl mx-auto">
-          <motion.h2
-            className="text-5xl md:text-7xl font-black text-center mb-20 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: 50 }}
+      <section id="contact" className="py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            LET'S BUILD THE FUTURE
-          </motion.h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Get In Touch
+            </h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Ready to collaborate on your next project? Let's discuss how we can work together.
+            </p>
+          </motion.div>
 
           <div className="grid lg:grid-cols-2 gap-16">
             <motion.div
@@ -1242,132 +1259,141 @@ export default function Portfolio() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-gray-800/50 relative">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.p
-            className="text-gray-400 text-lg"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            © 2024 Ankit Kumar. Securing the digital world, one system at a time.
-          </motion.p>
-          <motion.div
-            className="mt-4 text-sm text-gray-500"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-          </motion.div>
+      <footer className="py-12 px-6 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <motion.div
+              className="mb-4 md:mb-0"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <p className="text-gray-600 dark:text-gray-400">
+                © 2024 Ankit Kumar. All rights reserved.
+              </p>
+            </motion.div>
+            <motion.div
+              className="flex space-x-6"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              {[
+                { icon: Github, href: "https://github.com/Ankits39229", label: "GitHub" },
+                { icon: Linkedin, href: "https://linkedin.com/in/ankitkumar", label: "LinkedIn" },
+                { icon: Mail, href: "mailto:ankits39229@gmail.com", label: "Email" },
+              ].map((social, index) => (
+                <motion.a
+                  key={index}
+                  href={social.href}
+                  className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300"
+                  whileHover={{ y: -2 }}
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5" />
+                </motion.a>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </footer>
 
-      {/* Resume Preview Modal */}
+      {/* Professional Resume Preview Modal - Optimized Centering */}
       <AnimatePresence>
         {showResumeModal && (
-          <motion.div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 resume-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowResumeModal(false)}
-          >
+          <div className="modal-backdrop">
+            {/* Modal Backdrop */}
             <motion.div
-              className="relative bg-gray-900/95 backdrop-blur-xl border border-cyan-500/30 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
-              style={{ cursor: "default" }} // Add explicit cursor styling
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 bg-black/90 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowResumeModal(false)}
+              style={{ zIndex: 99990 }}
+            />
+            
+            {/* Modal Content - Perfectly Centered */}
+            <div 
+              className="modal-overlay" 
+              onClick={() => setShowResumeModal(false)}
             >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
-                <div>
-                  <h3 className="text-2xl font-bold text-cyan-400">Resume Preview</h3>
-                  <p className="text-gray-400 text-sm mt-1">Ankit Kumar - Cybersecurity & System Admin</p>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <motion.button
-                    onClick={() => {
-                      const link = document.createElement("a")
-                      link.href = "/resume.pdf"
-                      link.download = "Ankit_Kumar_Resume.pdf"
-                      link.click()
-                    }}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg cursor-hover text-sm font-semibold transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>Download</span>
-                  </motion.button>
-                  <motion.button
-                    onClick={() => window.open('/resume.pdf', '_blank')}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg cursor-hover text-sm font-semibold transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>Open in New Tab</span>
-                  </motion.button>
+              <motion.div
+                className="modal-container"
+                initial={{ scale: 0.9, opacity: 0, y: 0 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 0 }}
+                transition={{ type: "spring", duration: 0.5 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Simple Header */}
+                <div className="modal-header">
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Resume</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Ankit Kumar - Cybersecurity Specialist</p>
+                  </div>
+                  
+                  {/* Close Button */}
                   <motion.button
                     onClick={() => setShowResumeModal(false)}
-                    className="w-10 h-10 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 rounded-lg flex items-center justify-center cursor-hover transition-all duration-300"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    className="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <X className="w-5 h-5 text-gray-400" />
+                    <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   </motion.button>
                 </div>
-              </div>
 
-              {/* Modal Content */}
-              <div className="p-1 overflow-y-auto max-h-[calc(90vh-120px)]">
-                <div className="w-full h-[calc(90vh-130px)] bg-gray-800 rounded-lg overflow-hidden relative">
-                  {/* Skip the iframe approach entirely and use direct buttons */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 text-gray-400">
-                    <div className="text-center max-w-md px-6">
-                      <div className="mb-8">
-                        <div className="w-16 h-16 mx-auto mb-4">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 w-full h-full">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                          </svg>
-                        </div>
-                        <h3 className="text-2xl font-bold text-cyan-400 mb-2">Resume Options</h3>
-                        <p className="text-gray-400 mb-6">Choose how you'd like to view the resume</p>
+                {/* Simple Resume Download Content */}
+                <div className="modal-content p-12 flex flex-col items-center justify-center text-center">
+                  <div className="mb-8">
+                    <div className="w-24 h-24 mx-auto mb-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                      <svg className="w-12 h-12 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Ankit Kumar's Resume</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                      Thank you for your interest in my professional background. Click the button below to download my resume.
+                    </p>
+                  </div>
+                  
+                  <motion.a
+                    href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                    className="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-lg text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Download className="w-6 h-6 mr-3" />
+                    Download Resume (PDF)
+                  </motion.a>
+
+                  <div className="mt-10 max-w-lg mx-auto">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-3 text-lg">Quick Overview</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Education</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">B.Tech Computer Science & Engineering</p>
                       </div>
-                      
-                      <div className="space-y-4">
-                        <Button
-                          onClick={() => window.open('/resume.pdf', '_blank')}
-                          className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white w-full py-6 text-lg"
-                        >
-                          <ExternalLink className="w-5 h-5 mr-2" />
-                          Open in New Tab
-                        </Button>
-                        
-                        <Button
-                          onClick={() => {
-                            const link = document.createElement("a")
-                            link.href = "/resume.pdf"
-                            link.download = "Ankit_Kumar_Resume.pdf"
-                            link.click()
-                          }}
-                          variant="outline"
-                          className="border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black w-full py-6 text-lg"
-                        >
-                          <Download className="w-5 h-5 mr-2" />
-                          Download PDF
-                        </Button>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Experience</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">3+ Years Cybersecurity Experience</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Expertise</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Penetration Testing & System Administration</p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Skills</h5>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Python, Java, Security Tools Expert</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          </motion.div>
+              </motion.div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
     </div>

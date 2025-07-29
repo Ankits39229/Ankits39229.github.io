@@ -269,3 +269,247 @@
   transform-style: preserve-3d;
   backface-visibility: hidden;
 }
+
+/* Resume Modal Styles */
+.perfect-center {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+}
+
+/* Simple Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-container {
+  background-color: white;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  margin: auto;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-content {
+  overflow: auto;
+}
+
+.modal-iframe {
+  width: 100%;
+  height: 75vh;
+  border: none;
+}
+
+.dark .modal-container {
+  background-color: #1a202c;
+  border: 1px solid #2d3748;
+}
+
+.dark .modal-header {
+  border-bottom: 1px solid #2d3748;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-iframe {
+    height: 60vh;
+  }
+}
+
+/* Professional button animations */
+.professional-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.professional-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.professional-button:hover::before {
+  left: 100%;
+}
+
+/* Enhanced mobile touch targets */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .resume-action-button {
+    padding: 12px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Improved modal backdrop for mobile */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  
+  /* Prevent scrolling behind modal */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Enhanced PDF preview styles */
+.pdf-preview-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pdf-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #666;
+}
+
+/* PDF object embed fixes */
+object[data$=".pdf"],
+iframe[src$=".pdf"] {
+  display: block;
+  min-height: 400px;
+  width: 100%;
+}
+
+.pdf-container-with-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #f9f9f9; /* Light background to show loading state */
+}
+
+/* Chrome-specific fix */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  object[data$=".pdf"],
+  iframe[src$=".pdf"] {
+    height: 100% !important;
+  }
+}
+
+/* Professional modal transitions */
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.95) translateY(20px);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Improved accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible for keyboard navigation */
+.focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Enhanced loading state */
+.skeleton-loader {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Professional toast notifications */
+.toast-professional {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+/* Safe area handling for mobile devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .modal-safe-area {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
