@@ -39,7 +39,6 @@
 
   body {
     @apply bg-background text-foreground;
-    cursor: none;
     overflow-x: hidden;
     /* Enhanced performance optimizations */
     -webkit-font-smoothing: antialiased;

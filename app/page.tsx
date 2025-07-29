@@ -1,13 +1,8 @@
 "use client"
 
-import type React from "react"
-
-import { useEffect, useState, useRef, Suspense } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, Float, Stars } from "@react-three/drei"
+import React, { useEffect, useState, useRef, useCallback } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useInView } from "framer-motion"
-import type * as THREE from "three"
 import {
   Github,
   Linkedin,
@@ -29,173 +24,85 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-// Optimized 3D Scene with reduced complexity
-function OptimizedScene() {
-  const meshRef = useRef<THREE.Mesh>(null)
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.003 // Even slower rotation
-    }
-  })
-
-  return (
-    <>
-      <Stars radius={150} depth={20} count={3000} factor={3} saturation={0} fade />
-      <ambientLight intensity={0.2} />
-      <pointLight position={[10, 10, 10]} intensity={0.6} color="#00ffff" />
-
-      {/* Single central element with reduced complexity */}
-      <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.8}>
-        <mesh ref={meshRef} position={[0, 0, -5]}>
-          <torusGeometry args={[2, 0.3, 12, 32]} /> {/* Reduced segments */}
-          <meshStandardMaterial color="#00ffff" wireframe transparent opacity={0.5} />
-        </mesh>
-      </Float>
-
-      {/* Fewer floating shapes */}
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Float key={i} speed={0.3} rotationIntensity={0.2} floatIntensity={0.3}>
-          <mesh position={[(Math.random() - 0.5) * 12, (Math.random() - 0.5) * 12, (Math.random() - 0.5) * 12]}>
-            <boxGeometry args={[0.2, 0.2, 0.2]} />
-            <meshStandardMaterial
-              color={`hsl(${180 + Math.random() * 30}, 60%, 50%)`}
-              wireframe
-              transparent
-              opacity={0.3}
-            />
-          </mesh>
-        </Float>
-      ))}
-    </>
-  )
-}
-
-// Optimized Particle System with better performance
-function OptimizedParticleField() {
-  const points = useRef<THREE.Points>(null)
-  const particleCount = 100 // Further reduced
-
-  const positions = new Float32Array(particleCount * 3)
-
-  for (let i = 0; i < particleCount; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 40
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 40
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 40
-  }
-
-  useFrame((state) => {
-    if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.01 // Much slower rotation
-    }
-  })
-
-  return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" array={positions} count={particleCount} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial size={0.2} color="#00ffff" transparent opacity={0.3} />
-    </points>
-  )
-}
-
-// Optimized Custom Cursor with better performance
-function OptimizedCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [isHovering, setIsHovering] = useState(false)
-  const cursorRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let ticking = false
-
-    const updateMousePosition = (e: MouseEvent) => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setMousePosition({ x: e.clientX, y: e.clientY })
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      const shouldHover =
-        target.tagName === "BUTTON" ||
-        target.tagName === "A" ||
-        target.classList.contains("cursor-hover") ||
-        target.closest("button") !== null ||
-        target.closest("a") !== null ||
-        target.closest(".resume-modal") !== null
-
-      if (shouldHover !== isHovering) {
-        setIsHovering(shouldHover)
-      }
-    }
-
-    window.addEventListener("mousemove", updateMousePosition, { passive: true })
-    window.addEventListener("mouseover", handleMouseOver, { passive: true })
-
-    return () => {
-      window.removeEventListener("mousemove", updateMousePosition)
-      window.removeEventListener("mouseover", handleMouseOver)
-    }
-  }, [isHovering])
-
-  return (
-    <div
-      ref={cursorRef}
-      className="fixed top-0 left-0 pointer-events-none z-50 mix-blend-difference transition-transform duration-75 ease-out"
-      style={{
-        transform: `translate3d(${mousePosition.x - 8}px, ${mousePosition.y - 8}px, 0) scale(${isHovering ? 1.1 : 1})`,
-      }}
-    >
-      <div className={`w-4 h-4 bg-white rounded-full ${isHovering ? "opacity-80" : "opacity-60"}`} />
-    </div>
-  )
-}
-
-// Advanced Typewriter with Glitch Effect
+// Smooth and Professional Typewriter Component
 function GlitchTypewriter({ texts, delay = 0 }: { texts: string[]; delay?: number }) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [displayText, setDisplayText] = useState("")
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isGlitching, setIsGlitching] = useState(false)
-
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showCursor, setShowCursor] = useState(true)
+  const [hasStarted, setHasStarted] = useState(false)
+  
   useEffect(() => {
+    if (texts.length === 0) return
+    
+    // Handle initial delay
+    if (delay > 0 && !hasStarted) {
+      const initialDelay = setTimeout(() => {
+        setHasStarted(true)
+      }, delay)
+      return () => clearTimeout(initialDelay)
+    }
+    
+    if (delay === 0 && !hasStarted) {
+      setHasStarted(true)
+    }
+    
+    if (!hasStarted) return
+    
     const currentText = texts[currentTextIndex]
+    let timeoutId: NodeJS.Timeout
+    
+    if (!isDeleting) {
+      // Typing phase
+      if (displayText.length < currentText.length) {
+        timeoutId = setTimeout(() => {
+          setDisplayText(currentText.slice(0, displayText.length + 1))
+        }, 80) // Smooth typing speed
+      } else {
+        // Finished typing, pause then start deleting
+        timeoutId = setTimeout(() => {
+          setIsDeleting(true)
+        }, 1500) // Pause at full text
+      }
+    } else {
+      // Deleting phase
+      if (displayText.length > 0) {
+        timeoutId = setTimeout(() => {
+          setDisplayText(displayText.slice(0, -1))
+        }, 40) // Faster deletion
+      } else {
+        // Finished deleting, move to next text
+        timeoutId = setTimeout(() => {
+          setIsDeleting(false)
+          setCurrentTextIndex((prev) => (prev + 1) % texts.length)
+        }, 200) // Brief pause before next text
+      }
+    }
+    
+    return () => clearTimeout(timeoutId)
+  }, [displayText, currentTextIndex, isDeleting, texts, delay, hasStarted])
 
-    const timer = setTimeout(
-      () => {
-        if (currentIndex < currentText.length) {
-          setDisplayText((prev) => prev + currentText[currentIndex])
-          setCurrentIndex((prev) => prev + 1)
-
-          // Random glitch effect
-          if (Math.random() < 0.1) {
-            setIsGlitching(true)
-            setTimeout(() => setIsGlitching(false), 100)
-          }
-        } else {
-          // Move to next text after delay
-          setTimeout(() => {
-            setDisplayText("")
-            setCurrentIndex(0)
-            setCurrentTextIndex((prev) => (prev + 1) % texts.length)
-          }, 2000)
-        }
-      },
-      delay + currentIndex * 100,
-    )
-
-    return () => clearTimeout(timer)
-  }, [currentIndex, texts, currentTextIndex, delay])
+  // Smooth cursor blink effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev)
+    }, 530) // Slightly faster blink for smoother feel
+    
+    return () => clearInterval(cursorInterval)
+  }, [])
 
   return (
-    <span className={`${isGlitching ? "animate-pulse text-red-500" : ""}`}>
-      {displayText}
-      <span className="animate-pulse text-cyan-400">|</span>
+    <span className="relative inline-block min-h-[1.2em]">
+      <span className="transition-all duration-100 ease-out">
+        {displayText}
+      </span>
+      <span 
+        className={`text-cyan-400 ml-1 font-light transition-opacity duration-200 ${
+          showCursor ? 'opacity-100' : 'opacity-20'
+        }`}
+      >
+        |
+      </span>
     </span>
   )
 }
@@ -248,7 +155,7 @@ function SkillOrb({ skill, percentage, delay = 0 }: { skill: string; percentage:
   return (
     <motion.div
       ref={ref}
-      className="relative group cursor-hover"
+      className="relative group"
       initial={{ opacity: 0, scale: 0 }}
       animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
       transition={{ duration: 0.8, delay }}
@@ -451,6 +358,8 @@ export default function Portfolio() {
     return () => clearTimeout(timer)
   }, [])
 
+
+
   const projects = [
     {
       title: "Advanced Windows Security Application",
@@ -537,7 +446,6 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
-      <OptimizedCursor />
       <MinimalTechBackground />
 
       {/* Navigation */}
@@ -571,7 +479,7 @@ export default function Portfolio() {
                 <motion.button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className={`capitalize cursor-hover relative px-4 py-2 transition-all duration-300 ${
+                  className={`capitalize relative px-4 py-2 transition-all duration-300 ${
                     activeSection === item ? "text-cyan-400" : "text-gray-300 hover:text-cyan-400"
                   }`}
                   whileHover={{ y: -2 }}
@@ -591,7 +499,7 @@ export default function Portfolio() {
 
             {/* Mobile Menu Button */}
             <motion.button
-              className="md:hidden cursor-hover relative"
+              className="md:hidden relative"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               whileTap={{ y: 0 }}
             >
@@ -616,7 +524,7 @@ export default function Portfolio() {
             {/* Resume Download Button */}
             <motion.button
               onClick={() => setShowResumeModal(true)}
-              className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full cursor-hover text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30"
+              className="hidden md:flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -641,7 +549,7 @@ export default function Portfolio() {
                   <motion.button
                     key={item}
                     onClick={() => scrollToSection(item)}
-                    className="block w-full text-left capitalize text-gray-300 hover:text-cyan-400 transition-colors cursor-hover py-2"
+                    className="block w-full text-left capitalize text-gray-300 hover:text-cyan-400 transition-colors py-2"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -658,16 +566,6 @@ export default function Portfolio() {
 
       {/* Hero Section */}
       <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <Canvas camera={{ position: [0, 0, 10], fov: 75 }}>
-            <Suspense fallback={null}>
-              <OptimizedScene />
-              <OptimizedParticleField />
-              <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.2} />
-            </Suspense>
-          </Canvas>
-        </div>
-
         <motion.div className="text-center z-10 px-4 relative" style={{ y: backgroundY }}>
           <motion.div
             className="mb-8"
@@ -709,7 +607,7 @@ export default function Portfolio() {
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Button
                 onClick={() => scrollToSection("projects")}
-                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full cursor-hover text-lg font-semibold shadow-2xl relative overflow-hidden group"
+                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-2xl relative overflow-hidden group"
               >
                 <span className="relative z-10 flex items-center">
                   <Rocket className="w-5 h-5 mr-2" />
@@ -723,7 +621,7 @@ export default function Portfolio() {
               <Button
                 onClick={() => scrollToSection("contact")}
                 variant="outline"
-                className="border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black px-8 py-4 rounded-full cursor-hover text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
+                className="border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black px-8 py-4 rounded-full text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
               >
                 <span className="relative z-10 flex items-center">
                   <Zap className="w-5 h-5 mr-2" />
@@ -735,7 +633,7 @@ export default function Portfolio() {
               <Button
                 onClick={() => setShowResumeModal(true)}
                 variant="outline"
-                className="border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black px-8 py-4 rounded-full cursor-hover text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
+                className="border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black px-8 py-4 rounded-full text-lg font-semibold backdrop-blur-sm bg-black/20 relative overflow-hidden group"
               >
                 <span className="relative z-10 flex items-center">
                   <Eye className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"></Eye>
@@ -822,7 +720,7 @@ export default function Portfolio() {
                 ].map((stat, index) => (
                   <motion.div
                     key={index}
-                    className="text-center group cursor-hover"
+                    className="text-center group"
                     whileHover={{ y: -2 }}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -849,7 +747,7 @@ export default function Portfolio() {
                 <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
                   <Button
                     onClick={() => setShowResumeModal(true)}
-                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white px-8 py-3 rounded-full cursor-hover text-lg font-semibold shadow-2xl shadow-purple-500/30 relative overflow-hidden group"
+                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-2xl shadow-purple-500/30 relative overflow-hidden group"
                   >
                     <span className="relative z-10 flex items-center">
                       <Eye className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"></Eye>
@@ -914,7 +812,7 @@ export default function Portfolio() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group cursor-hover"
+                className="group"
               >
                 <div className="relative h-full">
                   {/* Enhanced glow effect */}
@@ -1022,7 +920,7 @@ export default function Portfolio() {
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Button
                 onClick={() => scrollToSection("contact")}
-                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full cursor-hover text-lg font-semibold shadow-2xl shadow-cyan-500/30"
+                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-2xl shadow-cyan-500/30"
               >
                 <Rocket className="w-5 h-5 mr-2" />
                 Start Your Project
@@ -1071,7 +969,7 @@ export default function Portfolio() {
             ].map((category, index) => (
               <motion.div
                 key={category.category}
-                className="group cursor-hover"
+                className="group"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
@@ -1266,7 +1164,7 @@ export default function Portfolio() {
                       <motion.a
                         key={index}
                         href={contact.href}
-                        className="flex items-center space-x-4 text-gray-300 hover:text-cyan-400 transition-all duration-300 cursor-hover group/link p-3 rounded-lg hover:bg-gray-800/30"
+                        className="flex items-center space-x-4 text-gray-300 hover:text-cyan-400 transition-all duration-300 group/link p-3 rounded-lg hover:bg-gray-800/30"
                         whileHover={{ x: 8 }}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -1302,34 +1200,34 @@ export default function Portfolio() {
                       <div className="relative">
                         <Input
                           placeholder="Your Name"
-                          className="bg-gray-800/60 border border-gray-600/50 hover:border-cyan-400/50 focus:border-cyan-400 text-white placeholder-gray-400 cursor-hover h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-cyan-400/30"
+                          className="bg-gray-800/60 border border-gray-600/50 hover:border-cyan-400/50 focus:border-cyan-400 text-white placeholder-gray-400 h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-cyan-400/30"
                         />
                       </div>
                       <div className="relative">
                         <Input
                           type="email"
                           placeholder="Your Email"
-                          className="bg-gray-800/60 border border-gray-600/50 hover:border-purple-400/50 focus:border-purple-400 text-white placeholder-gray-400 cursor-hover h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-purple-400/30"
+                          className="bg-gray-800/60 border border-gray-600/50 hover:border-purple-400/50 focus:border-purple-400 text-white placeholder-gray-400 h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-purple-400/30"
                         />
                       </div>
                     </div>
                     <div className="relative">
                       <Input
                         placeholder="Project Subject"
-                        className="bg-gray-800/60 border border-gray-600/50 hover:border-pink-400/50 focus:border-pink-400 text-white placeholder-gray-400 cursor-hover h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-pink-400/30"
+                        className="bg-gray-800/60 border border-gray-600/50 hover:border-pink-400/50 focus:border-pink-400 text-white placeholder-gray-400 h-12 rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-pink-400/30"
                       />
                     </div>
                     <div className="relative">
                       <Textarea
                         placeholder="Tell me about your vision..."
                         rows={6}
-                        className="bg-gray-800/60 border border-gray-600/50 hover:border-cyan-400/50 focus:border-cyan-400 text-white placeholder-gray-400 cursor-hover resize-none rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-cyan-400/30"
+                        className="bg-gray-800/60 border border-gray-600/50 hover:border-cyan-400/50 focus:border-cyan-400 text-white placeholder-gray-400 resize-none rounded-lg backdrop-blur-sm transition-all duration-300 focus:ring-1 focus:ring-cyan-400/30"
                       />
                     </div>
                     <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
                       <Button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white py-4 cursor-hover text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25"
+                        className="w-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 hover:from-cyan-600 hover:via-purple-600 hover:to-pink-600 text-white py-4 text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25"
                       >
                         <Send className="w-5 h-5 mr-2" />
                         Launch Project Discussion
@@ -1371,7 +1269,6 @@ export default function Portfolio() {
         {showResumeModal && (
           <motion.div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 resume-modal"
-            style={{ cursor: "default" }} // Add explicit cursor styling
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1407,6 +1304,15 @@ export default function Portfolio() {
                     <span>Download</span>
                   </motion.button>
                   <motion.button
+                    onClick={() => window.open('/resume.pdf', '_blank')}
+                    className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg cursor-hover text-sm font-semibold transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Open in New Tab</span>
+                  </motion.button>
+                  <motion.button
                     onClick={() => setShowResumeModal(false)}
                     className="w-10 h-10 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 rounded-lg flex items-center justify-center cursor-hover transition-all duration-300"
                     whileHover={{ scale: 1.1 }}
@@ -1418,183 +1324,43 @@ export default function Portfolio() {
               </div>
 
               {/* Modal Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]" style={{ cursor: "default" }}>
-                {/* Resume Content */}
-                <div
-                  className="bg-white text-black p-8 rounded-lg shadow-2xl max-w-3xl mx-auto"
-                  style={{ cursor: "default" }}
-                >
-                  {/* Header */}
-                  <div className="text-center mb-8 border-b-2 border-gray-300 pb-6">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">ANKIT KUMAR</h1>
-                    <h2 className="text-xl text-gray-600 mb-4">Cybersecurity Specialist & System Administrator</h2>
-                    <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-                      <span>📧 ankits39229@gmail.com</span>
-                      <span>📱 +91 7479584773</span>
-                      <span>🎓 B.Tech CSE (2022-2026)</span>
-                      <span>📍 Jaipur, India</span>
-                    </div>
-                  </div>
-
-                  {/* Objective */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-blue-500 pl-4">OBJECTIVE</h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      Detail-oriented and adaptive IT professional with hands-on experience in system administration,
-                      cybersecurity, and technical troubleshooting. Skilled in conducting CIS Benchmark audits,
-                      performing vulnerability assessments with tools like Nmap and Metasploit, and managing firewall
-                      monitoring and incident response. Passionate about securing digital environments and rapidly
-                      learning emerging technologies.
-                    </p>
-                  </div>
-
-                  {/* Education */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-green-500 pl-4">
-                      EDUCATION
-                    </h3>
-                    <div className="mb-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-lg font-semibold text-gray-800">
-                          Bachelor of Technology, Computer Science & Engineering
-                        </h4>
-                        <span className="text-sm text-gray-600">2022 - 2026</span>
+              <div className="p-1 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div className="w-full h-[calc(90vh-130px)] bg-gray-800 rounded-lg overflow-hidden relative">
+                  {/* Skip the iframe approach entirely and use direct buttons */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 text-gray-400">
+                    <div className="text-center max-w-md px-6">
+                      <div className="mb-8">
+                        <div className="w-16 h-16 mx-auto mb-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-cyan-400 w-full h-full">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-2xl font-bold text-cyan-400 mb-2">Resume Options</h3>
+                        <p className="text-gray-400 mb-6">Choose how you'd like to view the resume</p>
                       </div>
-                      <p className="text-gray-600 font-medium">University of Engineering & Management, Jaipur</p>
-                      <p className="text-gray-700 text-sm">
-                        Relevant Coursework: Data Structures & Algorithms, Software Engineering Principles, Cloud
-                        Computing
-                      </p>
-                      <p className="text-gray-700 text-sm mt-1">
-                        Ongoing hands-on learning through hackathons, team projects, and independent contributions to
-                        open-source tools
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Experience & Leadership */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-purple-500 pl-4">
-                      EXPERIENCE & LEADERSHIP
-                    </h3>
-
-                    <div className="mb-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-lg font-semibold text-gray-800">
-                          Finalist – Advanced Windows Security Application
-                        </h4>
-                        <span className="text-sm text-gray-600">March 2025</span>
-                      </div>
-                      <p className="text-gray-600 font-medium mb-2">Ace Hack 4.0</p>
-                      <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        <li>
-                          Led a team to develop a comprehensive Windows security tool using Java Swing, Python, and
-                          machine learning
-                        </li>
-                        <li>
-                          Key features included junk file cleanup, diagnostics, firewall monitoring, CIS audit, and
-                          malware scanning
-                        </li>
-                        <li>Implemented blockchain-based licensing and static/dynamic malware detection</li>
-                        <li>Earned finalist recognition among 400+ competing teams for innovation and impact</li>
-                      </ul>
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-lg font-semibold text-gray-800">Team Leader – HackUEM (4th Place)</h4>
-                        <span className="text-sm text-gray-600">2024</span>
-                      </div>
-                      <p className="text-gray-600 font-medium mb-2">University of Engineering & Management, Jaipur</p>
-                      <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-                        <li>Secured 4th position among top college teams in a 24-hour hackathon</li>
-                        <li>Developed innovative solution under pressure with rapid prototyping</li>
-                        <li>Gained hands-on experience in teamwork and applying emerging technologies</li>
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Technical Skills */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-red-500 pl-4">
-                      TECHNICAL SKILLS
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">Programming Languages</h4>
-                        <p className="text-gray-700 text-sm">Python, Java (Swing), Batch scripting, C, C++</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">Operating Systems</h4>
-                        <p className="text-gray-700 text-sm">Windows, Linux</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">Security Tools & Frameworks</h4>
-                        <p className="text-gray-700 text-sm">
-                          Nmap, Metasploit, Aircrack-ng, Autopsy, Firewall monitoring
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">Cybersecurity Practices</h4>
-                        <p className="text-gray-700 text-sm">
-                          Vulnerability scanning, penetration testing, CIS Benchmark audits, incident response
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">System Administration</h4>
-                        <p className="text-gray-700 text-sm">
-                          IT support, performance optimization, diagnostics, data recovery & backup
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">Other Technologies</h4>
-                        <p className="text-gray-700 text-sm">
-                          Blockchain (licensing), Machine Learning (malware detection)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Key Projects */}
-                  <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-yellow-500 pl-4">
-                      KEY PROJECTS
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-semibold text-gray-800">Advanced Windows Security Application</h4>
-                        <p className="text-gray-700 text-sm">
-                          Built a standalone security tool with modules for junk file cleanup, diagnostics, firewall
-                          monitoring, CIS audits, and malware scanning using both static and dynamic ML models. Featured
-                          blockchain-based licensing.
-                        </p>
-                        <p className="text-gray-600 text-xs mt-1">
-                          Technologies: Java Swing, Python, Batch, Blockchain, Machine Learning
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Achievements */}
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-l-4 border-indigo-500 pl-4">
-                      ACHIEVEMENTS & RECOGNITION
-                    </h3>
-                    <div className="space-y-2">
-                      <div>
-                        <h4 className="font-semibold text-gray-800">Hackathon Achievements</h4>
-                        <ul className="text-gray-700 text-sm space-y-1">
-                          <li>• Finalist - Ace Hack 4.0 (March 2025) - Advanced Windows Security Application</li>
-                          <li>• 4th Place - HackUEM College-Level Hackathon (2024)</li>
-                        </ul>
-                      </div>
-                      <div className="mt-4">
-                        <h4 className="font-semibold text-gray-800">Technical Expertise</h4>
-                        <ul className="text-gray-700 text-sm space-y-1">
-                          <li>• Proficient in vulnerability assessment and penetration testing</li>
-                          <li>• Experience with CIS Benchmark compliance auditing</li>
-                          <li>• Skilled in malware detection using machine learning techniques</li>
-                        </ul>
+                      
+                      <div className="space-y-4">
+                        <Button
+                          onClick={() => window.open('/resume.pdf', '_blank')}
+                          className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white w-full py-6 text-lg"
+                        >
+                          <ExternalLink className="w-5 h-5 mr-2" />
+                          Open in New Tab
+                        </Button>
+                        
+                        <Button
+                          onClick={() => {
+                            const link = document.createElement("a")
+                            link.href = "/resume.pdf"
+                            link.download = "Ankit_Kumar_Resume.pdf"
+                            link.click()
+                          }}
+                          variant="outline"
+                          className="border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black w-full py-6 text-lg"
+                        >
+                          <Download className="w-5 h-5 mr-2" />
+                          Download PDF
+                        </Button>
                       </div>
                     </div>
                   </div>
