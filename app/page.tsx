@@ -391,15 +391,15 @@ export default function Portfolio() {
   const projects = [
     {
       title: "Advanced Windows Security Application",
-      description: "Comprehensive security tool with junk cleanup, diagnostics, firewall monitoring, and CIS audits",
+      description: "A standalone security tool with modules for junk file cleanup, diagnostics, firewall monitoring, CIS audits,and malware scanning using both static and dynamic ML models. Featured blockchain-based licensing.",
       image: "/placeholder.svg?height=300&width=500&text=Windows+Security+Tool",
-      tech: ["Java Swing", "Python", "Machine Learning", "Blockchain"],
+      tech: ["Java Swing", "Python", "Machine Learning", "Blockchain" , "Bash Scripting"],
       github: "#",
       demo: "#",
     },
     {
-      title: "Malware Detection System",
-      description: "Static and dynamic malware scanning using machine learning models for threat detection",
+      title: "Technician Application (admin-server-client)",
+      description: "A standalone windows-based utility application with features for cleaning temp files , troubleshooting system failures, network monitoring and CIS audits.",
       image: "/placeholder.svg?height=300&width=500&text=Malware+Detection+AI",
       tech: ["Python", "Machine Learning", "Static Analysis", "Dynamic Analysis"],
       github: "#",
@@ -413,30 +413,7 @@ export default function Portfolio() {
       github: "#",
       demo: "#",
     },
-    {
-      title: "CIS Benchmark Audit Tool",
-      description: "Automated compliance checking against CIS security benchmarks",
-      image: "/placeholder.svg?height=300&width=500&text=CIS+Compliance+Audit",
-      tech: ["Python", "Windows API", "Security Auditing", "Compliance"],
-      github: "#",
-      demo: "#",
-    },
-    {
-      title: "Firewall Monitoring Dashboard",
-      description: "Real-time firewall activity monitoring and incident response system",
-      image: "/placeholder.svg?height=300&width=500&text=Firewall+Monitor+Live",
-      tech: ["Python", "Network Monitoring", "Incident Response", "Data Visualization"],
-      github: "#",
-      demo: "#",
-    },
-    {
-      title: "Digital Forensics Toolkit",
-      description: "Collection of tools for digital investigation and evidence analysis",
-      image: "/placeholder.svg?height=300&width=500&text=Digital+Forensics+Suite",
-      tech: ["Python", "Autopsy", "Data Recovery", "Forensic Analysis"],
-      github: "#",
-      demo: "#",
-    },
+    
   ]
 
   const skills = [
@@ -526,11 +503,11 @@ export default function Portfolio() {
               whileTap={{ scale: 0.95 }}
             >
               <a 
-                href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                href="https://drive.google.com/file/d/1rFChCl9LEoekmBLh752UuoJ6zcrz07Xa/view?usp=sharing"
                 className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
               >
                 <Download className="w-4 h-4" />
-                <span>Download CV</span>
+                <span>Download Resume</span>
               </a>
             </motion.div>
 
@@ -587,7 +564,7 @@ export default function Portfolio() {
                 ))}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <a
-                    href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                    href="https://drive.google.com/file/d/1rFChCl9LEoekmBLh752UuoJ6zcrz07Xa/view?usp=sharing"
                     className="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 text-center"
                   >
                     <Download className="w-4 h-4 mr-2 inline" />
@@ -617,7 +594,7 @@ export default function Portfolio() {
               </h1>
               <div className="text-xl md:text-2xl lg:text-3xl text-gray-300 font-medium tracking-wide">
                 <GlitchTypewriter
-                  texts={["Cybersecurity Specialist", "System Administrator", "Security Researcher", "IT Professional"]}
+                  texts={["System Optimization", "Technical Troubleshooting", "IT Support", "Data Backup & Recovery", "Web Developer", "Application Developer"]}
                   delay={500}
                 />
               </div>
@@ -630,9 +607,9 @@ export default function Portfolio() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.2 }}
           >
-            Dedicated to securing digital environments through{" "}
-            <span className="text-blue-400 font-medium">advanced cybersecurity practices</span>,{" "}
-            <span className="text-cyan-400 font-medium">comprehensive system administration</span>, and{" "}
+            Dedicated to digital environments through{" "}
+            <span className="text-blue-400 font-medium">Web Development</span>,{" "}
+            <span className="text-cyan-400 font-medium">Application Development</span>, and{" "}
             <span className="text-teal-400 font-medium">proactive vulnerability assessment</span>
           </motion.p>
 
@@ -669,7 +646,7 @@ export default function Portfolio() {
             
             <motion.div whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <a
-                href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
+                href="https://drive.google.com/file/d/1rFChCl9LEoekmBLh752UuoJ6zcrz07Xa/view?usp=drive_link"
                 className="border-2 border-cyan-600 text-cyan-400 hover:bg-cyan-600 hover:text-white px-8 py-3 rounded-lg text-base font-medium transition-all duration-300 inline-flex items-center"
               >
                 <Download className="w-5 h-5 mr-2" />
@@ -686,9 +663,9 @@ export default function Portfolio() {
             transition={{ duration: 0.8, delay: 2 }}
           >
             {[
-              { number: "10+", label: "Security Projects" },
-              { number: "3+", label: "Years Experience" },
-              { number: "25+", label: "Technologies" },
+              { number: "10+", label: "Projects" },
+              { number: "0+", label: "Years Experience" },
+              { number: "5+", label: "Technologies" },
             ].map((stat, index) => (
               <motion.div key={index} className="text-center" whileHover={{ y: -2 }}>
                 <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-1">{stat.number}</div>
@@ -730,8 +707,8 @@ export default function Portfolio() {
                   practical experience in vulnerability assessment and incident response.
                 </p>
                 <p>
-                  My expertise encompasses <span className="text-cyan-600 dark:text-cyan-400 font-medium">penetration testing</span>,
-                  <span className="text-teal-600 dark:text-teal-400 font-medium"> malware analysis</span>, and
+                  My expertise encompasses <span className="text-cyan-600 dark:text-cyan-400 font-medium">web application development</span>,
+                  <span className="text-teal-600 dark:text-teal-400 font-medium"> web application security</span>, and
                   <span className="text-blue-600 dark:text-blue-400 font-medium"> system optimization</span>. I've successfully developed
                   comprehensive security tools and led teams in competitive environments, earning recognition for
                   innovative and effective solutions.
@@ -973,7 +950,7 @@ export default function Portfolio() {
               {
                 category: "Development",
                 icon: Wrench,
-                skills: ["Python/Java", "Machine Learning", "Blockchain", "Security Tools"],
+                skills: ["Python/Java", "Machine Learning", "Blockchain", "Web Development", "Application Development"],
                 color: "from-green-500 to-teal-500",
                 accentColor: "green",
               },
@@ -1099,9 +1076,7 @@ export default function Portfolio() {
                 "Autopsy",
                 "Wireshark",
                 "Burp Suite",
-                "OWASP ZAP",
                 "Kali Linux",
-                "Windows Server",
                 "PowerShell",
                 "Bash",
                 "Git",
@@ -1300,102 +1275,7 @@ export default function Portfolio() {
         </div>
       </footer>
 
-      {/* Professional Resume Preview Modal - Optimized Centering */}
-      <AnimatePresence>
-        {showResumeModal && (
-          <div className="modal-backdrop">
-            {/* Modal Backdrop */}
-            <motion.div
-              className="fixed inset-0 bg-black/90 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowResumeModal(false)}
-              style={{ zIndex: 99990 }}
-            />
-            
-            {/* Modal Content - Perfectly Centered */}
-            <div 
-              className="modal-overlay" 
-              onClick={() => setShowResumeModal(false)}
-            >
-              <motion.div
-                className="modal-container"
-                initial={{ scale: 0.9, opacity: 0, y: 0 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 0 }}
-                transition={{ type: "spring", duration: 0.5 }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Simple Header */}
-                <div className="modal-header">
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Resume</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Ankit Kumar - Cybersecurity Specialist</p>
-                  </div>
-                  
-                  {/* Close Button */}
-                  <motion.button
-                    onClick={() => setShowResumeModal(false)}
-                    className="flex items-center justify-center w-10 h-10 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                  </motion.button>
-                </div>
-
-                {/* Simple Resume Download Content */}
-                <div className="modal-content p-12 flex flex-col items-center justify-center text-center">
-                  <div className="mb-8">
-                    <div className="w-24 h-24 mx-auto mb-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                      <svg className="w-12 h-12 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Ankit Kumar's Resume</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
-                      Thank you for your interest in my professional background. Click the button below to download my resume.
-                    </p>
-                  </div>
-                  
-                  <motion.a
-                    href="https://drive.google.com/uc?export=download&id=1kbhVW_jwXflxY3XN3gzLFWE3DCuaIj-2"
-                    className="flex items-center bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-lg text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Download className="w-6 h-6 mr-3" />
-                    Download Resume (PDF)
-                  </motion.a>
-
-                  <div className="mt-10 max-w-lg mx-auto">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-3 text-lg">Quick Overview</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Education</h5>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">B.Tech Computer Science & Engineering</p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Experience</h5>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">3+ Years Cybersecurity Experience</p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Expertise</h5>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Penetration Testing & System Administration</p>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-2">Skills</h5>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Python, Java, Security Tools Expert</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        )}
-      </AnimatePresence>
+      
     </div>
   )
 }
