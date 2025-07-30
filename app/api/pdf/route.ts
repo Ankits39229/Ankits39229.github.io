@@ -22,7 +22,7 @@ export async function GET() {
     return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'inline; filename="Ankit_Kumar_Resume.pdf"',
+        'Content-Disposition': 'inline; filename="Ankit_Kumar.pdf"',
         'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
       },
     });
