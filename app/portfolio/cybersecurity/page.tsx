@@ -39,7 +39,7 @@ export default function CybersecurityPage() {
     <div className="min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <motion.div
+        <div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -61,12 +61,12 @@ export default function CybersecurityPage() {
             Security tools, penetration testing frameworks, and vulnerability assessment projects focused on protecting
             digital assets.
           </p>
-        </motion.div>
+        </div>
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
-            <motion.div
+            <div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -185,12 +185,12 @@ export default function CybersecurityPage() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Security Focus Banner */}
-        <motion.div
+        <div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -205,10 +205,10 @@ export default function CybersecurityPage() {
               tools are designed to help organizations identify and fix vulnerabilities in their systems.
             </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Stats Section */}
-        <motion.div
+        <div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -231,7 +231,7 @@ export default function CybersecurityPage() {
             </div>
             <div className="text-neutral-300">Advanced Projects</div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

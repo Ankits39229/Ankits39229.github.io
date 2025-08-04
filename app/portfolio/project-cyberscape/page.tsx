@@ -1,7 +1,12 @@
-import CyberscapeScene from "@/components/project/cyberscape-scene"
+import dynamic from "next/dynamic"
 import FeatureCard from "@/components/project/feature-card"
 import ProjectHeader from "@/components/project/project-header"
 import ProjectNavigation from "@/components/project/project-navigation"
+
+const CyberscapeScene = dynamic(() => import("@/components/project/cyberscape-scene"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
+})
 
 const features = [
   {

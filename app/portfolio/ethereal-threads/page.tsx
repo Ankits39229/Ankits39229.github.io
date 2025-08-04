@@ -1,7 +1,12 @@
-import EtherealScene from "@/components/project/ethereal-scene"
+import dynamic from "next/dynamic"
 import FeatureCard from "@/components/project/feature-card"
 import ProjectHeader from "@/components/project/project-header"
 import ProjectNavigation from "@/components/project/project-navigation"
+
+const EtherealScene = dynamic(() => import("@/components/project/ethereal-scene"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-purple-900 to-black" />
+})
 
 const features = [
   {

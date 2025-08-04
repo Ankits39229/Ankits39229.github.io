@@ -1,7 +1,12 @@
-import QuantumScene from "@/components/project/quantum-scene"
+import dynamic from "next/dynamic"
 import FeatureCard from "@/components/project/feature-card"
 import ProjectHeader from "@/components/project/project-header"
 import ProjectNavigation from "@/components/project/project-navigation"
+
+const QuantumScene = dynamic(() => import("@/components/project/quantum-scene"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-black" />
+})
 
 const features = [
   {

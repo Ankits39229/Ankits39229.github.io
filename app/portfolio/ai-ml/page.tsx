@@ -39,7 +39,7 @@ export default function AiMlPage() {
     <div className="min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <motion.div
+        <div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -60,12 +60,12 @@ export default function AiMlPage() {
           <p className="text-xl text-neutral-300 max-w-3xl">
             Intelligent systems, machine learning models, and AI-powered applications that solve real-world problems.
           </p>
-        </motion.div>
+        </div>
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
-            <motion.div
+            <div
               key={project.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -184,12 +184,12 @@ export default function AiMlPage() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* AI Focus Banner */}
-        <motion.div
+        <div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -205,10 +205,10 @@ export default function AiMlPage() {
               artificial intelligence.
             </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Stats Section */}
-        <motion.div
+        <div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -231,7 +231,7 @@ export default function AiMlPage() {
             </div>
             <div className="text-neutral-300">Advanced ML</div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   )

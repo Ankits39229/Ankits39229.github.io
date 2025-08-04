@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 
 const QuantumScene = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
+  const [isClient, setIsClient] = useState(false)
   const particlesRef = useRef<
     Array<{
       x: number
@@ -19,6 +20,8 @@ const QuantumScene = () => {
   >([])
 
   useEffect(() => {
+    setIsClient(true)
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -26,16 +29,29 @@ const QuantumScene = () => {
     if (!ctx) return
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      if (typeof window !== 'undefined') {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
     }
 
     resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener("resize", resizeCanvas)
+    }
 
     // Initialize particles
     const particleCount = 300
-    const particles = []
+    const particles: Array<{
+      x: number
+      y: number
+      vx: number
+      vy: number
+      size: number
+      opacity: number
+      life: number
+    }> = []
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -138,7 +154,9 @@ const QuantumScene = () => {
     animate()
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("resize", resizeCanvas)
+      }
       canvas.removeEventListener("mousemove", handleMouseMove)
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
@@ -150,7 +168,7 @@ const QuantumScene = () => {
     <div className="absolute inset-0">
       <canvas ref={canvasRef} className="w-full h-full" />
       {/* Energy waves */}
-      {[...Array(5)].map((_, i) => (
+      {isClient && [...Array(5)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute border border-blue-400 rounded-full opacity-20"

@@ -1,13 +1,16 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion } from "framer-motion"
 
 const CyberscapeScene = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>()
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -15,12 +18,17 @@ const CyberscapeScene = () => {
     if (!ctx) return
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      if (typeof window !== 'undefined') {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
     }
 
     resizeCanvas()
-    window.addEventListener("resize", resizeCanvas)
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener("resize", resizeCanvas)
+    }
 
     let time = 0
     let mouseX = 0
@@ -99,7 +107,9 @@ const CyberscapeScene = () => {
     animate()
 
     return () => {
-      window.removeEventListener("resize", resizeCanvas)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("resize", resizeCanvas)
+      }
       canvas.removeEventListener("mousemove", handleMouseMove)
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
@@ -111,24 +121,24 @@ const CyberscapeScene = () => {
     <div className="absolute inset-0">
       <canvas ref={canvasRef} className="w-full h-full" />
       {/* Additional animated elements */}
-      {[...Array(20)].map((_, i) => (
+      {isClient && [...Array(20)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-20 bg-cyan-400 opacity-60"
           animate={{
-            x: [0, window.innerWidth || 1920],
+            x: [0, 1920],
             opacity: [0, 1, 0],
             scaleY: [0.5, 1, 0.5],
           }}
           transition={{
-            duration: 3 + Math.random() * 2,
+            duration: 3 + (i % 3),
             repeat: Number.POSITIVE_INFINITY,
-            delay: Math.random() * 3,
+            delay: i * 0.2,
             ease: "linear",
           }}
           style={{
             left: -10,
-            top: Math.random() * 100 + "%",
+            top: (i * 5) % 100 + "%",
           }}
         />
       ))}
